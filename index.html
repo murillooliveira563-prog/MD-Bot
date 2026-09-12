@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Atendimento | Dr. Ricardo Júnior</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="chat">
+
+        <!-- CABEÇALHO DO ATENDIMENTO -->
+        <header class="chat-cabecalho">
+
+            <div class="avatar">
+                ⚖️
+            </div>
+
+            <div class="dados-cabecalho">
+
+    <h1>Dr. Ricardo Júnior</h1>
+
+    <p>Advogado Criminalista</p>
+
+    <span class="status">
+        ● Assistente virtual • online
+    </span>
+
+</div>
+
+        </header>
+
+
+        <!-- MENSAGENS DO ROBÔ E DO CLIENTE -->
+        <section
+            id="mensagens"
+            class="mensagens">
+        </section>
+
+
+        <!-- BOTÕES DE OPÇÕES -->
+        <section
+            id="opcoes"
+            class="opcoes">
+        </section>
+
+<!-- CAMPO PARA DIGITAR MENSAGEM -->
+<section
+    id="entrada"
+    class="entrada entrada-escondida">
+
+    <input
+        id="campoMensagem"
+        type="text"
+        placeholder="Digite sua mensagem..."
+        autocomplete="off"
+    >
+
+    <button id="botaoEnviar">
+        ➤
+    </button>
+
+</section>
+
+    </main>
+
+
+    <!-- CONFIGURAÇÕES DO CLIENTE -->
+    <script src="config.js"></script>
+
+    <!-- CÉREBRO DO ROBÔ -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>

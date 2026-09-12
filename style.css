@@ -1,0 +1,274 @@
+/* ==============================
+   CONFIGURAÇÕES GERAIS
+============================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #e9ecef;
+
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+}
+
+
+/* ==============================
+   CHAT
+============================== */
+
+.chat {
+    width: 100%;
+    max-width: 450px;
+
+    height: 700px;
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+
+/* ==============================
+   CABEÇALHO
+============================== */
+
+.chat-cabecalho {
+    background: linear-gradient(
+        135deg,
+        #111111,
+        #2b2b2b
+    );
+    padding: 18px 20px;
+}
+
+.chat-cabecalho h1 {
+    font-size: 18px;
+}
+
+.chat-cabecalho p {
+    font-size: 13px;
+    color: #cfcfcf;
+
+    margin-top: 4px;
+}
+
+
+/* ==============================
+   AVATAR
+============================== */
+
+.avatar {
+    width: 48px;
+    height: 48px;
+
+    background: #3a3a3a;
+
+    border-radius: 50%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 22px;
+}
+
+
+/* ==============================
+   ÁREA DAS MENSAGENS
+============================== */
+
+.mensagens {
+    flex: 1;
+
+    padding: 20px;
+
+    overflow-y: auto;
+
+    background: #eeeeee;
+}
+
+
+/* ==============================
+   MENSAGENS
+============================== */
+
+.mensagem {
+    max-width: 85%;
+
+    padding: 12px 15px;
+
+    margin-bottom: 12px;
+
+    border-radius: 15px;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+white-space: pre-line;
+
+}
+
+
+/* MENSAGEM DO ROBÔ */
+
+.mensagem-robo {
+    background: white;
+
+    color: #222;
+
+    border-bottom-left-radius: 4px;
+}
+
+
+/* MENSAGEM DO CLIENTE */
+
+.mensagem-cliente {
+    background: #1f1f1f;
+
+    color: white;
+
+    margin-left: auto;
+
+    border-bottom-right-radius: 4px;
+}
+
+
+/* ==============================
+   OPÇÕES
+============================== */
+
+.opcoes {
+    padding: 15px;
+
+    background: white;
+
+    border-top: 1px solid #dddddd;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+/* ==============================
+   BOTÕES
+============================== */
+
+.botao-opcao {
+    border: none;
+
+    padding: 13px;
+
+    border-radius: 10px;
+
+    background: #2d2d2d;
+
+    color: white;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+font-weight: 600;
+
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.botao-opcao:hover {
+    background: #444444;
+
+    transform: translateY(-2px);
+}
+
+/* ==============================
+   CAMPO DE DIGITAÇÃO
+============================== */
+
+.entrada {
+    padding: 12px;
+
+    background: white;
+
+    border-top: 1px solid #dddddd;
+
+    display: flex;
+
+    gap: 10px;
+}
+
+.entrada input {
+    flex: 1;
+
+    border: 1px solid #cccccc;
+
+    border-radius: 20px;
+
+    padding: 12px 15px;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
+.entrada input:focus {
+    border-color: #555555;
+}
+
+.entrada button {
+    width: 44px;
+    height: 44px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #1f1f1f;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 18px;
+}
+
+.entrada-escondida {
+    display: none;
+}
+
+/* ==============================
+   STATUS DO ASSISTENTE
+============================== */
+
+.dados-cabecalho {
+    display: flex;
+    flex-direction: column;
+}
+
+.status {
+    margin-top: 5px;
+
+    font-size: 11px;
+
+    color: #bdbdbd;
+}

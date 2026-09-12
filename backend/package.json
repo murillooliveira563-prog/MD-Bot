@@ -1,0 +1,13 @@
+{
+  "name": "md-bot-whatsapp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bot de atendimento do Dr. Ricardo Junior integrado ao WhatsApp Cloud API",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0"
+  }
+}
