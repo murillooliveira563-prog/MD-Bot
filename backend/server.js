@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const crypto = require("crypto");
 const express = require("express");
+const twilio = require("twilio");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,6 +11,16 @@ const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN || "";
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID || "";
 const GRAPH_API_VERSION = process.env.GRAPH_API_VERSION || "v26.0";
 const APP_SECRET = process.env.APP_SECRET || "";
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
+const TWILIO_WHATSAPP_FROM = process.env.TWILIO_WHATSAPP_FROM;
+const JUNIOR_WHATSAPP = process.env.JUNIOR_WHATSAPP;
+
+const twilioClient =
+  TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN
+    ? twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    : null;
+
 
 const palavrasUrgentes = [
   "preso", "presa", "prisão", "prisao", "flagrante", "detido", "detida", "mandado de prisão", "mandado de prisao",
@@ -199,15 +210,58 @@ function processarMensagem(telefone, nomeContato, mensagem) {
   }
 
   if (a.etapa === "coletar_relato") {
-    a.relato = mensagem; if (detectarUrgencia(a.relato)) a.prioridade = "urgente"; a.etapa = "finalizado";
-    console.log("\n================================\n" + gerarFicha(a) + "\n================================\n");
-    return a.prioridade === "urgente"
-      ? `Obrigado, ${a.nome}.\n\n🚨 Seu atendimento foi registrado como prioritário.\n\nAs informações serão direcionadas ao Dr. Ricardo Júnior.\n\nPara iniciar outro atendimento, envie NOVO.`
-      : `Obrigado, ${a.nome}.\n\nSeu atendimento foi registrado.\n\nAs informações serão direcionadas ao Dr. Ricardo Júnior.\n\nPara iniciar outro atendimento, envie NOVO.`;
+  a.relato = mensagem;
+
+  if (detectarUrgencia(a.relato)) {
+    a.prioridade = "urgente";
   }
+
+  a.etapa = "finalizado";
+
+  console.log(
+    "\n================================\n" +
+    gerarFicha(a) +
+    "\n================================\n"
+  );
+
+  // Envia automaticamente a ficha para o Dr. Ricardo Júnior
+  enviarFichaParaJunior(a);
+
+  return a.prioridade === "urgente"
+    ? `Obrigado, ${a.nome}.\n\n🚨 Seu atendimento foi registrado como prioritário.\n\nAs informações serão direcionadas ao Dr. Ricardo Júnior.\n\nPara iniciar outro atendimento, envie NOVO.`
+    : `Obrigado, ${a.nome}.\n\nSeu atendimento foi registrado.\n\nAs informações serão direcionadas ao Dr. Ricardo Júnior.\n\nPara iniciar outro atendimento, envie NOVO.`;
+}
 
   if (a.etapa === "finalizado") return "Este atendimento já foi finalizado.\n\nPara iniciar outro atendimento, envie NOVO.";
   return "Não consegui identificar a etapa do atendimento. Envie MENU para recomeçar.";
+}
+
+async function enviarFichaParaJunior(atendimento) {
+  if (!twilioClient || !TWILIO_WHATSAPP_FROM || !JUNIOR_WHATSAPP) {
+    console.log("⚠️ Twilio ou WhatsApp do Júnior ainda não configurados.");
+    return;
+  }
+
+  const cabecalho =
+    atendimento.prioridade === "urgente"
+      ? "🚨🚨🚨 URGÊNCIA CRIMINAL 🚨🚨🚨"
+      : "📋 NOVO ATENDIMENTO";
+
+  const mensagem = `${cabecalho}
+
+${gerarFicha(atendimento)}`;
+
+  try {
+    const envio = await twilioClient.messages.create({
+      from: TWILIO_WHATSAPP_FROM,
+      to: JUNIOR_WHATSAPP,
+      body: mensagem
+    });
+
+    console.log(`✅ Ficha enviada ao Júnior. SID: ${envio.sid}`);
+  } catch (erro) {
+    console.error("❌ Erro ao enviar ficha ao Júnior:", erro.message);
+  }
 }
 
 async function enviarMensagemWhatsApp(telefone, texto) {
