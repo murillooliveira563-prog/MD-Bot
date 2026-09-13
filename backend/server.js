@@ -75,7 +75,9 @@ const atendimentos = new Map();
 const mensagensProcessadas = new Set();
 
 app.use(express.json({ verify(req, res, buf) { req.rawBody = Buffer.from(buf); } }));
-
+app.use(express.urlencoded({
+    extended: false
+}));
 function normalizarTexto(texto) {
   return String(texto).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -270,4 +272,72 @@ app.post("/webhook", (req, res) => {
   processarEventoMeta(req.body).catch(err => console.error("❌ Erro processando webhook:", err));
 });
 
-app.listen(PORT, "0.0.0.0", () => console.log(`🤖 MD Bot rodando na porta ${PORT}`));
+// ==================================================
+// WEBHOOK DA TWILIO
+// ==================================================
+
+function escaparXml(texto) {
+
+    return String(texto)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+}
+
+
+app.post("/twilio", function(req, res) {
+
+    const telefone =
+        String(req.body.From || "")
+            .replace("whatsapp:", "");
+
+    const nome =
+        String(
+            req.body.ProfileName ||
+            "Cliente"
+        );
+
+    const mensagem =
+        String(
+            req.body.Body ||
+            ""
+        ).trim();
+
+
+    console.log(
+        `📩 WhatsApp: ${telefone} - ${mensagem}`
+    );
+
+
+    const resposta =
+        processarMensagem(
+            telefone,
+            nome,
+            mensagem
+        );
+
+
+    res
+        .type("text/xml")
+        .send(`
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Message>${escaparXml(resposta)}</Message>
+</Response>
+        `.trim());
+});
+
+
+// ==================================================
+// LIGAR SERVIDOR
+// ==================================================
+
+app.listen(
+    PORT,
+    "0.0.0.0",
+    () => console.log(
+        `🤖 MD Bot rodando na porta ${PORT}`
+    )
+);
