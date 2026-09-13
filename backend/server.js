@@ -488,6 +488,10 @@ async function processarMensagem(
 
   const comando = mensagem.toLowerCase();
 
+  // ------------------------------------------------------
+  // NOVO / MENU / REINICIAR
+  // ------------------------------------------------------
+
   if (
     comando === "novo" ||
     comando === "menu" ||
@@ -503,6 +507,10 @@ async function processarMensagem(
     return menuPrincipal();
   }
 
+  // ------------------------------------------------------
+  // PRIMEIRO CONTATO
+  // ------------------------------------------------------
+
   if (!atendimentos.has(telefone)) {
     const atendimento = criarAtendimento(
       telefone,
@@ -515,6 +523,10 @@ async function processarMensagem(
   }
 
   const a = atendimentos.get(telefone);
+
+  // ------------------------------------------------------
+  // MENU PRINCIPAL
+  // ------------------------------------------------------
 
   if (a.etapa === "menu_principal") {
     if (mensagem === "1") {
@@ -535,6 +547,10 @@ async function processarMensagem(
 
 ${menuPrincipal()}`;
   }
+
+  // ------------------------------------------------------
+  // CATEGORIA CRIMINAL
+  // ------------------------------------------------------
 
   if (a.etapa === "categoria_criminal") {
     const categoria = CATEGORIAS_CRIMINAL[mensagem];
@@ -557,6 +573,10 @@ ${menuCriminal()}`;
     return gerarMenuAssuntos(categoria);
   }
 
+  // ------------------------------------------------------
+  // CATEGORIA OUTROS
+  // ------------------------------------------------------
+
   if (a.etapa === "categoria_outros") {
     const categoria = CATEGORIAS_OUTROS[mensagem];
 
@@ -573,6 +593,10 @@ ${menuOutros()}`;
 
     return gerarMenuAssuntos(categoria);
   }
+
+  // ------------------------------------------------------
+  // ASSUNTO
+  // ------------------------------------------------------
 
   if (a.etapa === "assunto") {
     const assunto =
@@ -593,6 +617,10 @@ ${gerarMenuAssuntos(a.categoriaSelecionada)}`;
 Para continuar, qual é o seu nome?`;
   }
 
+  // ------------------------------------------------------
+  // NOME
+  // ------------------------------------------------------
+
   if (a.etapa === "coletar_nome") {
     a.nome = mensagem;
 
@@ -607,6 +635,10 @@ Agora informe a cidade ou local relacionado à situação.`
 Agora informe sua cidade ou a cidade relacionada ao atendimento.`;
   }
 
+  // ------------------------------------------------------
+  // CIDADE
+  // ------------------------------------------------------
+
   if (a.etapa === "coletar_cidade") {
     a.cidade = mensagem;
 
@@ -616,6 +648,10 @@ Agora informe sua cidade ou a cidade relacionada ao atendimento.`;
       ? "Certo. Agora conte brevemente, com suas próprias palavras, o que aconteceu."
       : "Certo. Agora explique brevemente sua situação e o que você precisa resolver.";
   }
+
+  // ------------------------------------------------------
+  // RELATO / FINALIZAÇÃO
+  // ------------------------------------------------------
 
   if (a.etapa === "coletar_relato") {
     a.relato = mensagem;
@@ -632,8 +668,11 @@ Agora informe sua cidade ou a cidade relacionada ao atendimento.`;
         "\n================================\n"
     );
 
+    // Salva permanentemente no PostgreSQL
     await salvarAtendimento(a);
 
+    // Tenta enviar a ficha para o Júnior
+    // No Trial da Twilio isso pode ser bloqueado.
     enviarFichaParaJunior(a);
 
     if (a.prioridade === "urgente") {
@@ -655,6 +694,10 @@ As informações serão direcionadas ao Dr. Ricardo Júnior.
 Para iniciar outro atendimento, envie NOVO.`;
   }
 
+  // ------------------------------------------------------
+  // ATENDIMENTO FINALIZADO
+  // ------------------------------------------------------
+
   if (a.etapa === "finalizado") {
     return `Este atendimento já foi finalizado.
 
@@ -664,6 +707,19 @@ Para iniciar outro atendimento, envie NOVO.`;
   return `Não consegui identificar a etapa do atendimento.
 
 Envie MENU para recomeçar.`;
+}
+
+// ======================================================
+// XML SEGURO PARA TWILIO
+// ======================================================
+
+function escaparXml(texto) {
+  return String(texto)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }
 
 // ======================================================
@@ -694,32 +750,28 @@ app.post("/twilio", async (req, res) => {
       mensagem
     );
 
-    console.log(`🤖 Resposta do bot: ${resposta}`);
-
-    const twiml = new twilio.twiml.MessagingResponse();
-
-    twiml.message(resposta);
-
     res
-      .status(200)
       .type("text/xml")
-      .send(twiml.toString());
+      .send(
+        `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>${escaparXml(resposta)}</Message>
+</Response>`
+      );
   } catch (erro) {
     console.error(
       "❌ Erro no webhook da Twilio:",
       erro
     );
 
-    const twiml = new twilio.twiml.MessagingResponse();
-
-    twiml.message(
-      "Ocorreu um erro no atendimento. Por favor, tente novamente."
-    );
-
     res
-      .status(200)
       .type("text/xml")
-      .send(twiml.toString());
+      .send(
+        `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>Ocorreu um erro no atendimento. Por favor, tente novamente.</Message>
+</Response>`
+      );
   }
 });
 
