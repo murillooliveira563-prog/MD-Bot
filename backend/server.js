@@ -12,8 +12,7 @@ const GRAPH_API_VERSION = process.env.GRAPH_API_VERSION || "v26.0";
 const APP_SECRET = process.env.APP_SECRET || "";
 
 const palavrasUrgentes = [
-  "preso", "presa", "prisão", "prisao", "flagrante", "detido", "detida",
-  "delegacia", "mandado de prisão", "mandado de prisao",
+  "preso", "presa", "prisão", "prisao", "flagrante", "detido", "detida", "mandado de prisão", "mandado de prisao",
   "audiência de custódia", "audiencia de custodia", "habeas corpus"
 ];
 
